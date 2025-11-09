@@ -1,0 +1,55 @@
+I have two controllers and one service:
+
+GreetingWebController — returns a web page (HTML view)
+GreetingRestController — returns raw data (text or JSON)
+GreetingAppService — contains the actual business logic
+
+Difference between the two controllers:
+
+| Controller               | Annotation        | Purpose                                   | URL Example  | Return Type                                      |
+| ------------------------ | ----------------- | ----------------------------------------- | ------------ | ------------------------------------------------ |
+| `GreetingWebController`  | `@Controller`     | Serves a web **view (HTML)** for browsers | `/`          | returns `"index"` → a template like `index.html` |
+| `GreetingRestController` | `@RestController` | Serves **data (JSON / text)** for APIs    | `/api/greet` | returns raw text `"Hello, ..."`                  |
+
+In short:
+@Controller → for web pages (frontend)
+@RestController → for REST APIs (backend / API clients)
+
+Visiting http://localhost:8080/ → renders index.html with the greeting
+Visiting http://localhost:8080/api/greet?name=Reza → returns text or JSON response
+
+
+
+They are decoupled — they do not affect each other because:
+
+Each listens on its own path (/ vs /api/greet)
+They both use the same service layer, but independently
+
+GreetingAppService is the business logic layer.
+It’s not mandatory — we could move its logic into the controller, but that’s bad practice.
+
+
+
+
+Why it’s good to keep it:
+*Separation of concerns
+Controllers handle HTTP requests; services handle logic.
+*Reusability
+Both controllers can use the same greeting logic — as they do right now.
+*Testability
+we can unit-test GreetingAppService without loading the web context.
+
+
+
+
+So:
+Technically: we can delete it.
+Practically: we shouldn’t — it’s good design.
+
+
+
+| Component                | Role               | Can Delete?                  | Affects Others?               |
+| ------------------------ | ------------------ | ---------------------------- | ----------------------------- |
+| `GreetingWebController`  | Web page (HTML UI) | Only if we don’t need HTML  | No                            |
+| `GreetingRestController` | REST API (data)    | Only if we don’t need API   | No                            |
+| `GreetingAppService`     | Business logic     | we can, but not recommended | Both controllers depend on it |
